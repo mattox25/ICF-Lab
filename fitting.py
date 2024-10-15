@@ -19,16 +19,19 @@ def gaussian(x, *params):
 # This section will make a numpy array containing a gaussian 
 #
 
-# This makes a numpy array with 100 equally spaced points between 0 and 4
-xdata = np.linspace(0,4,100)
+# # This makes a numpy array with 100 equally spaced points between 0 and 4
+# xdata = np.linspace(0,4,100)
 
-# This makes a gaussian using these x points
-ydata = gaussian(xdata, 3, 2, 0.2)
+# # This makes a gaussian using these x points
+# ydata = gaussian(xdata, 3, 2, 0.2)
 
-# Lets add some noise
-for i in range(len(ydata)):
-	ydata[i] +=  0.4*(np.random.random_sample()-0.5)
+# # Lets add some noise
+# for i in range(len(ydata)):
+# 	ydata[i] +=  0.4*(np.random.random_sample()-0.5)
 
+# Create x/y data from a lineout file
+xdata , ydata = icf.load_2col ("lineout1.csv")
+xdata = xdata * 60.0
 
 #
 # This section will do a fit
