@@ -163,17 +163,20 @@ def fixed_param_curve_fit(func, xdata, ydata, guesses, fixes):
 	return totpopt, pcov
 	
 			
-def fit_plot(xdata, ydata, fitdata, xl="", yl=""):
+def fit_plot(xdata, ydata, xdata_masked, ydata_masked, yfitdata,
+			  xl="Distance (microns)", yl="Greyscale Value"):
 
 	f, axarr = plt.subplots(2, sharex=True)
 	axarr[1].plot(xdata, ydata, lw=2, label="Data")
-	axarr[1].plot(xdata, fitdata, lw=2, label="Fit")
+	axarr[1].plot(xdata_masked, yfitdata, lw=2, label="Fit")
 	axarr[1].legend()
 	axarr[1].set_xlabel(xl)
 	axarr[1].set_ylabel(yl)	
-	axarr[0].plot(xdata, ydata-fitdata, lw=2, label="Residual") 				
+
+	axarr[0].plot(xdata_masked, ydata_masked-yfitdata, lw=2, label="Residual") 				
 	axarr[0].yaxis.tick_right()
 	axarr[0].set_ylabel("Residual")
+	axarr[0].set_title("Wax1")
 
 
 	f.subplots_adjust(hspace=0)
