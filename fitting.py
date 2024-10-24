@@ -50,38 +50,15 @@ def supergaussian_linear(x, *params):
 # 	ydata[i] +=  0.4*(np.random.random_sample()-0.5)
 
 # Create x/y data from a lineout file
-xdata1 , ydata1 = icf.load_2col ("lineout1.csv")
-xdata1 = xdata1 * 60.0/3.5
-maskmin1, maskmax1 = 100/3.5, 3000/3.5
-maskmin2, maskmax2 = 100/3.5, 3000/3.5
-maskmin3, maskmax3 = 350/3.5, 2500/3.5
-maskmin4, maskmax4 = 650/3.5, 2700/3.5
-
-xdata2 , ydata2 = icf.load_2col ("lineout2.csv")
-xdata2 = xdata2 * 60.0/3.5
-
-xdata3 , ydata3 = icf.load_2col ("lineout3.csv")
-xdata3 = xdata3 * 60.0/3.5
-
-xdata4 , ydata4 = icf.load_2col ("lineout4.csv")
-xdata4 = xdata4 * 60.0/3.5
+xdata , ydata = icf.load_2col ("line4.2.csv")
+xdata = xdata * 60.0/3.5
+# IMPORTANT: Mask must be changed manually
+maskmin, maskmax = 270, 1250
 
 # mask the data to pass into the fitting function
-mask1 = (xdata1 >=maskmin1) & (xdata1 <= maskmax1)
-xdata1_mask = xdata1[mask1]
-ydata1_mask = ydata1[mask1]
-
-mask2 = (xdata2 >=maskmin1) & (xdata2 <= maskmax1)
-xdata2_mask = xdata2[mask2]
-ydata2_mask = ydata2[mask2]
-
-mask3 = (xdata3 >=maskmin3) & (xdata3 <= maskmax3)
-xdata3_mask = xdata3[mask3]
-ydata3_mask = ydata3[mask3]
-
-mask4 = (xdata4 >=maskmin4) & (xdata4 <= maskmax4)
-xdata4_mask = xdata4[mask4]
-ydata4_mask = ydata4[mask4]
+mask = (xdata >=maskmin) & (xdata <= maskmax)
+xdata_mask = xdata[mask]
+ydata_mask = ydata[mask]
 
 #
 # This section will do a fit
@@ -94,19 +71,20 @@ ydata4_mask = ydata4[mask4]
 Rvals = []
 nvals = [2, 4, 6, 8, 10]
 for i in nvals:
-	guess = np.array([3000,1600,500,28000, 1])/3.5
+	guess = np.array([2000,700,150,28000, 1])
 	n = i
-	res, cov = curve_fit(supergaussian_linear, xdata4, ydata4, p0=guess)
-	yfit = supergaussian_linear(xdata4, *res)
-	Rvals.append(icf.r_squared(ydata4, yfit))
+	res, cov = curve_fit(supergaussian_linear, xdata, ydata, p0=guess)
+	yfit = supergaussian_linear(xdata, *res)
+	Rvals.append(icf.r_squared(ydata, yfit))
 
 n = nvals[np.argmax(Rvals)]
 
+print(f'The values of R are {Rvals}')
 print(f'The best value of n is: {n}')
 
-guess = np.array([3000,1600,500,28000, 3.5])/3.5
+guess = np.array([2000,700,150,28000, 1])
 print("Our initial guess is", guess)
-popt, pcov = curve_fit(supergaussian_linear, xdata4, ydata4, p0=guess)
+popt, pcov = curve_fit(supergaussian_linear, xdata, ydata, p0=guess)
 
 for i in range(len(popt)):
 	print ("Parameter",i,":",popt[i],"+/-",np.sqrt(pcov[i][i]))
@@ -117,13 +95,14 @@ print("Fit standard deviations : ", np.sqrt(np.diag(pcov)))
 # This generates a new list with a Gaussian using the identified fit parameters
 # This data is therefore the best fit curve 
 
-yfit = supergaussian_linear(xdata4, *popt, n)
+yfit = supergaussian_linear(xdata_mask, *popt, n)
 
-print("R^2 = ", icf.r_squared(ydata4, yfit))
+
+print("R^2 = ", icf.r_squared(ydata_mask, yfit))
 
 # This will plot the output, both the original data and the best fit, as well as a residual
 # Note this is a special plotting routine written for the icf labs, hence the 'icf' prefix
 # The source code can be found in icf.py if you want to copy/alter it
  
-icf.fit_plot(xdata4, ydata4, xdata4, ydata4, yfit)
+icf.fit_plot(xdata, ydata, xdata_mask, ydata_mask, yfit)
 

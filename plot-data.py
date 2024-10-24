@@ -1,5 +1,6 @@
 import icf
 import matplotlib.pyplot as plt
+from fitting import *
 
 
 # Load in the data from Google Sheets
