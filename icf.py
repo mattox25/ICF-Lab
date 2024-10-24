@@ -176,7 +176,7 @@ def fit_plot(xdata, ydata, xdata_masked, ydata_masked, yfitdata,
 	axarr[0].plot(xdata_masked, ydata_masked-yfitdata, lw=2, label="Residual") 				
 	axarr[0].yaxis.tick_right()
 	axarr[0].set_ylabel("Residual")
-	axarr[0].set_title("Wax1")
+	axarr[0].set_title("Wax4 with linear term")
 
 
 	f.subplots_adjust(hspace=0)

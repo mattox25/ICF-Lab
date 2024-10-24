@@ -33,7 +33,7 @@ def supergaussian_linear(x, *params):
 	y0 = params[3]
 	z0 = params[4]
 	
-	return y0 + z0*x**3 + A*np.exp(-((x-x0)/(np.sqrt(2)*c))**n)
+	return y0 + z0*x + A*np.exp(-((x-x0)/(np.sqrt(2)*c))**n)
 
 #
 # This section will make a numpy array containing a gaussian 
@@ -52,8 +52,8 @@ def supergaussian_linear(x, *params):
 # Create x/y data from a lineout file
 xdata1 , ydata1 = icf.load_2col ("lineout1.csv")
 xdata1 = xdata1 * 60.0/3.5
-maskmin1, maskmax1 = 480/3.5, 2700/3.5
 maskmin1, maskmax1 = 100/3.5, 3000/3.5
+maskmin2, maskmax2 = 100/3.5, 3000/3.5
 maskmin3, maskmax3 = 350/3.5, 2500/3.5
 maskmin4, maskmax4 = 650/3.5, 2700/3.5
 
@@ -94,11 +94,11 @@ ydata4_mask = ydata4[mask4]
 Rvals = []
 nvals = [2, 4, 6, 8, 10]
 for i in nvals:
-	guess = np.array([3000,1600,500,28000, 3.5])/3.5
+	guess = np.array([3000,1600,500,28000, 1])/3.5
 	n = i
-	res, cov = curve_fit(supergaussian_linear, xdata2_mask, ydata2_mask, p0=guess)
-	yfit = supergaussian_linear(xdata2_mask, *res)
-	Rvals.append(icf.r_squared(ydata2_mask, yfit))
+	res, cov = curve_fit(supergaussian_linear, xdata4, ydata4, p0=guess)
+	yfit = supergaussian_linear(xdata4, *res)
+	Rvals.append(icf.r_squared(ydata4, yfit))
 
 n = nvals[np.argmax(Rvals)]
 
@@ -106,7 +106,7 @@ print(f'The best value of n is: {n}')
 
 guess = np.array([3000,1600,500,28000, 3.5])/3.5
 print("Our initial guess is", guess)
-popt, pcov = curve_fit(supergaussian_linear, xdata2_mask, ydata2_mask, p0=guess)
+popt, pcov = curve_fit(supergaussian_linear, xdata4, ydata4, p0=guess)
 
 for i in range(len(popt)):
 	print ("Parameter",i,":",popt[i],"+/-",np.sqrt(pcov[i][i]))
@@ -117,13 +117,13 @@ print("Fit standard deviations : ", np.sqrt(np.diag(pcov)))
 # This generates a new list with a Gaussian using the identified fit parameters
 # This data is therefore the best fit curve 
 
-yfit = supergaussian(xdata2_mask, *popt, n)
+yfit = supergaussian_linear(xdata4, *popt, n)
 
-print("R^2 = ", icf.r_squared(ydata2_mask, yfit))
+print("R^2 = ", icf.r_squared(ydata4, yfit))
 
 # This will plot the output, both the original data and the best fit, as well as a residual
 # Note this is a special plotting routine written for the icf labs, hence the 'icf' prefix
 # The source code can be found in icf.py if you want to copy/alter it
  
-icf.fit_plot(xdata2, ydata2, xdata2_mask, ydata2_mask, yfit)
+icf.fit_plot(xdata4, ydata4, xdata4, ydata4, yfit)
 
